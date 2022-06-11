@@ -1,0 +1,318 @@
+#########################################################################
+tccide howto: transform tcc4tcl inline c into loadable dll
+#########################################################################
+
+tccide is a simple small script with just one goal:
+
+if you work with tcc4tcl as inline compiler and have some readily developed code
+you can take the code generating tcl-source
+and transform it into a compilable c-file
+and compile it into a loadable dll
+
+tccide helps with
+transforming the inline-code into a external c-file with all needed decals for building a windows dll
+and moreover trys to find the right includes/libs for the compiler
+so it spits out three additional lines in the fileheader
+wich resemble basic commandline arguments for tcc.exe // gcc.exe and i686-w64-mingw32-gcc (crosscompiler linux--> win64/32)
+
+if all parts work you can now just compile the c-file into a tcl-loadable dll
+the necessary tclsub/tkstub libs are bundled in the directory lib 
+and come in two flavors, libtclstub86.a as COFF and libtclstub86elf.a as ELF, the latter for use with tcc
+
+Minimal TCL-Example
+TCL-Code looks like this and is a minimal example for inline C-code
+
+#########################################################################
+set handle [tcc4tcl::new]
+#$handle tk
+#not necessary for this example, so commented out
+
+$handle ccode {
+    #include <stdio.h>
+    #include <math.h>
+    
+    #define __i386__ 1
+    #if defined(__i386__)
+    // FPU control word for rounding to nearest mode
+    unsigned short __tcc_fpu_control = 0x137f;
+    // FPU control word for round to zero mode for int conversion
+    unsigned short __tcc_int_fpu_control = 0x137f | 0x0c00;
+    #endif
+    #define _WIN32
+}
+
+$handle cproc testPrintf {Tcl_Interp* interp } char* {
+     return "Hello World!";
+}
+
+#END OF TCL CODE
+##########################################################################
+
+Now we can compile this inline to see if the code is functional
+
+$handle go
+
+Ok, next rerun script (to refresh the handle)
+
+and build package code with
+
+::tcc4tcl::write_packagecode $handle testpkg
+
+
+This will create the file testpkg.c
+and spit out the compiler directives
+
+Resulting C-CODE in testpkg.c
+#########################################################################
+/* tcc.exe -shared -Iinclude/ -Iinclude/1 -Iinclude/sec_api -Iinclude/sys testpkg.c -ltclstub86elf -ltkstub86elf -Llib  */
+
+/* gcc.exe -shared -s -m32 -D_WIN32 -Iincludetcl -Iinclude/xlib testpkg.c -Llib -ltclstub86 -ltkstub86 -Llib -otestpkg.dll -Ofast */
+
+/* i686-w64-mingw32-gcc -shared -s -m32 -D_WIN32 -Iincludetcl -Iinclude/xlib testpkg.c -Llib -ltclstub86 -ltkstub86 -Llib  -otestpkg.dll -Ofast*/
+
+#define USE_TCL_STUBS 1
+#include <tcl.h>
+
+    #include <stdio.h>
+    #include <math.h>
+    
+    #define __i386__ 1
+    #if defined(__i386__)
+    // FPU control word for rounding to nearest mode
+    unsigned short __tcc_fpu_control = 0x137f;
+    // FPU control word for round to zero mode for int conversion
+    unsigned short __tcc_int_fpu_control = 0x137f | 0x0c00;
+    #endif
+    #define _WIN32
+
+static char* c_testPrintf(Tcl_Interp* interp) {
+
+     return "Hello World!";
+}
+
+int tcl_testPrintf(ClientData clientdata, Tcl_Interp *ip, int objc, Tcl_Obj *CONST objv[]) {
+  char* rv;
+  if (objc != 1) {
+    Tcl_WrongNumArgs(ip, 1, objv, "");
+    return TCL_ERROR;
+  }
+
+  rv = c_testPrintf(ip);
+  if (rv == NULL) {
+    return(TCL_ERROR);
+  }
+  Tcl_SetResult(ip, rv, TCL_STATIC);
+  return TCL_OK;
+}
+
+
+__declspec(dllexport) 
+int Testpkg_Init(Tcl_Interp *interp) {
+#ifdef USE_TCL_STUBS
+  if (Tcl_InitStubs(interp, TCL_VERSION, 0) == 0L) {
+    return TCL_ERROR;
+  }
+#endif
+#ifdef USE_TK_STUBS
+  if (Tk_InitStubs(interp, TCL_VERSION, 0) == 0L) {
+    return TCL_ERROR;
+  }
+#endif
+  Tcl_CreateObjCommand(interp, "testPrintf", tcl_testPrintf, NULL, NULL);
+  Tcl_PkgProvide(interp, "testpkg", "1.0");
+  return(TCL_OK);
+}
+# End of C-Code
+#########################################################################
+
+
+#########################################################################
+# Compiler-Directives
+	tcc.exe -shared -Iinclude/ -Iinclude/1 -Iinclude/sec_api -Iinclude/sys testpkg.c -ltclstub86elf -ltkstub86elf -Llib
+	gcc.exe -shared -s -m32 -D_WIN32 -Iincludetcl -Iinclude/xlib testpkg.c -Llib -ltclstub86 -ltkstub86 -Llib -otestpkg.dll -Ofast
+	i686-w64-mingw32-gcc -shared -s -m32 -D_WIN32 -Iincludetcl -Iinclude/xlib testpkg.c -Llib -ltclstub86 -ltkstub86 -Llib -otestpkg.dll -Ofast
+#
+#########################################################################
+
+Maybe you have to correct some paths, but in general this should run out of the box if tcc/gcc/mingw32 is installed and configured correctly
+Just adapt the commands to your liking and compile
+
+Voila, the result is testpkg.dll
+wich can be loaded into any tcltk windows environment (8.6 or higher, or adapt the TCL_VERSION in testpkg.c at your own risk)
+and presents the command testPrintf wich will puts the helloworld-message
+
+
+#########################################################################
+Usage of TSP TCL STATIC PRIME
+a kind of TCL to C transpiler
+
+package require tsp
+
+#tsp::debug ./dbg
+
+# ::tsp::init_package PACKAGENAME
+
+# $::tsp::TCC_HANDLE ccode {}
+# $::tsp::TCC_HANDLE tk
+# and so on holds a valid of tcc4tcl handle after ::tsp::init_package is used
+# otherwise is empty ...
+# low level tcc4tcl and highlevel tsp API can be mixed
+
+$handle ccode {
+	// put some c-code here
+}
+
+$handle cproc mycproc {} int {
+	return 0
+}
+
+tsp::proc fib {n} {
+	# Transpile, will be compiled to PACKAGENAME.c
+	# a TCL twin will be written to PACKAGENAME.tclprocs.tcl
+	#tsp::procdef int -args int
+	#tsp::int fib_2 fib_1
+	#puts "fib c $n"
+	if {$n < 2} {return 1}
+        set fib_2 [fib [expr {$n -2}]]
+        set fib_1 [fib [expr {$n -1}]]
+	set result [expr {$fib_2 + $fib_1}]
+	return $result
+}
+
+proc TCL_proc {} {
+	# pure tcl, will be written to PACKAGENAME.puretcl.tcl
+	puts "Do something..."
+}
+
+proc PACKAGENAME_pkgInit {} {
+	# this will init the package after loading
+}
+
+::tsp::printLog
+#::tsp::finalize_package DIRNAME tcc
+# will write testpkg.c which can be compiled externaly as packege//dll like mentioned above
+# with tcc/gcc/cross will compile to start compiler directly, but no guarantee this will do
+# without, package is just written to DIRNAME and will not compile immediately
+# Pure TCL Packages are also possible
+
+# 
+
+25-April 2022 MiR
+#########################################################################
+#
+# Namespace support since May 2022
+#
+# Variable will be loaded/spilled on proc entry/exit ONLY
+#
+# Added pragma #tsp::inlinec 
+# now you can code inline directly, to speed up critical things
+# 
+# Codeexample below
+#
+# basic namespace support
+# implemented May 2022
+# you can define an namespace in the package_init directive
+# and all tsp::proc and handle cproc/cwrap etc definitions will be placed within the namespace automatically
+# you can use variable xx to get namespace vars
+# but be careful, those will only be updated on prco enter/exit... not in between
+# so calling a subroutine from a cproc will fail in this respect, since NS Vars are not updated!
+#
+#
+# example to build against namespace tnsx
+
+
+package require tsp
+#tsp::debug tcc_0.9.27-bin/dbg
+
+# init package pkgName {pkgNamespace pkgVersion tcl_version}
+tsp::init_package tnsxzwo tnsx 0.1 8.5
+
+# eval namespace for immediate use, we want to place tclprocs into it
+namespace eval tnsx { }
+
+# get existing handle
+set handle $::tsp::TCC_HANDLE
+
+# this is a raw cproc directly in tcc
+# will have no default tcl implementation, but we handle this in pkgInit
+$handle cproc t1 {int i} double {
+    return i;
+}
+
+# procs need namespace qualifiers
+proc ::tnsx::test2 {} {
+    #puts "ok test2"
+    for {set i 0} {$i<100000} {incr i} {
+        set l [tnsx::t1 $i]
+        set l [expr {sqrt($l*$l*0.33)}]
+    }
+    #puts "test2 $l"
+}
+
+# tsp procs dont need namespace qualifiers, will be placed there automatically
+# this one inlines a call to t1 (cproc) and a math function
+# and also holds tsp::altTCL for fallback
+
+tsp::proc test3 {ii ss} {
+    #tsp::procdef void -args int string
+    #tsp::int i
+    #tsp::double l
+    #puts "ok test3"
+    for {set i 0} {$i<100000} {incr i} {
+        #tsp::inlinec __l = c_t1(__i);#
+        #tsp::altTCL set l [tnsx::t1 $i]
+        #tsp::inlinec __l = sqrt(__l*__l*0.33);
+        #tsp::altTCL set l [expr {sqrt($l*$l*0.33)}]
+    }
+    #puts "test3 $l"
+}
+
+# global proc
+proc test4 {} {
+    puts "ok test4"
+}
+
+#namespaced proc
+# will be placed in namespace automatically
+tsp::proc test {} {
+    #tsp::procdef void
+    #tsp::int cl 
+    set cl [clock seconds]
+    puts "time $cl"
+    set rs [tnsx::t1 5]
+    puts "Result from Test: $rs"
+    puts "test 2 running"
+    puts [time "tnsx::test2"]
+    puts "test 3 running"
+    puts [time "tnsx::test3 1 a"]
+    test4
+    return
+}
+
+#pkgInit will be called after loading
+# init package if necessary
+# here we replace the default for cproc t1
+
+proc tnsxzwo_pkgInit {} {
+    if {[::tnsx::t1 5] != 5} {
+        puts "Problem loading binary extension\nt1 is not implemented, replacing with tcl version"
+        proc ::tnsx::t1 {i} {
+            puts "Calling tcl t1"
+            return $i
+        }
+    }
+}
+
+tsp::printLog
+# finalize package in directory tnsxzwo, use tcc to compile (can be tcc gcc cross or intern (=memory)), use none to only write package
+tsp::finalize_package tnsxzwo tcc
+# compiler can be tcc gcc lin64 or intern (will compile directly to memory) or export (internal tcc to dll//so)
+
+# test package using external shell
+# tsp::test_packageX tnsxzwo tnsx::test 
+# fire up a shell and load package, run test
+
+
+
+
+
