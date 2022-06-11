@@ -4,7 +4,7 @@ tccide is a TCL-Starkit to make use of tcc4tcl (TinyC Compiler for TCL) and TSP 
 Starkit contains a modified Version of tcc4tcl (based on tcc 0.9.26), a modified version of TSP and a small Texteditor with Console to directly start coding.
 
 Sample code to start using tcc and TSP
-
+```
 #-----------------------------------------------------------
 package require tsp
 
@@ -37,3 +37,5 @@ tclnop
 #tspnop
 #tclnop
 #--------------------------------------------------
+```
+More info in howto_tccide
