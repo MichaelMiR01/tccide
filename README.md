@@ -1,9 +1,10 @@
 # tccide
-tccide is a TCL-Starkit to make use of tcc4tcl (TinyC Compiler for TCL) and TSP (Tom Pointdexters Tcl Static Prime TCL Transpiler) 
+tccide is a TCL-Starkit that makes use of tcc4tcl (TinyC Compiler for TCL) and TSP (Tom Pointdexters Tcl Static Prime TCL Transpiler) 
+It can transpile/compile a subset of TCL procs, see TSP README and DOCS for further information. See also howto_tccide.txt
 
-Starkit contains a modified Version of tcc4tcl (based on tcc 0.9.26), a modified version of TSP and a small Texteditor with Console to directly start coding. This should work with TCL/Tk 8.6 and contains binaries for Win32 and Linux64 (Lin32 is missing, sorry, didn't compile this :-)
+Starkit contains a modified Version of tcc4tcl (based on tcc 0.9.26/0.9.27), a modified version of TSP and a small Texteditor with Console to directly start coding. This should work with TCL/Tk 8.6 and contains binaries for Win32 and Linux64 (Lin32 is missing, sorry, didn't compile this :-)
 
-The modified sources for TCC and TSP are 
+The modified sources for TCC and TSP are in theese repos/forks
 
 https://github.com/MichaelMiR01/tcc4tcl
 
