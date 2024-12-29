@@ -1,4 +1,4 @@
-/***************** Automatically Created with TCC4TCL Helper and maybe TSP **********************************/
+/***************** Fri Dec 27 23:31:53 +0100 2024 Automatically Created with TCC4TCL Helper and maybe TSP **********************************/
 /* Compiler directives are raw estimates, please adapt to given pathstructure */
 
 /* for gccwin32 use */
@@ -13,7 +13,7 @@
 /* for tcc use */
 /* /host/data/tcl/tcc_0.9.27-bin/tcc.exe  -m32 -D_WIN32  -shared -DUSE_TCL_STUBS -O2  -Iinclude -Iinclude/stdinc -Iinclude/generic -Iinclude/generic/win -Iinclude/xlib -Iwin32 -Iwin32/winapi  -Itsp-package/native/clang/ -I../tccide_tutorial ../tccide_tutorial/tccide_tutorial.c -o../tccide_tutorial/tccide_tutorial.dll -ltclstub86elf -ltkstub86elf -Llib -L../tccide_tutorial */
 
-/***************** Automatically Created with TCC4TCL Helper and maybe TSP **********************************/
+/***************** Fri Dec 27 23:31:53 +0100 2024 Automatically Created with TCC4TCL Helper and maybe TSP **********************************/
 #include <tcl.h>
 /* All TCL needs an interp... */
 /* External callbacks won't know about an Tcl_Interp, so ...*/
@@ -51,7 +51,7 @@ int tcl___loot_interp(ClientData clientdata, Tcl_Interp *ip, int objc, Tcl_Obj *
 #   endif
 #endif
 /***************************************************************/
-/* START OF PACKAGE_HEADER */
+/* START OF PACKAGE_HEADER TSP (Version 20241227-230217) */
 /* don't forget to declare includedir tsp-package/native/clang/ in the right way */
 #include <string.h>
 #include <tclInt.h>
@@ -59,8 +59,8 @@ int tcl___loot_interp(ClientData clientdata, Tcl_Interp *ip, int objc, Tcl_Obj *
 #include "TSP_func.c"
 #include "TSP_util.c"
 /* END OF PACKAGE_HEADER */
-static char* c_cnop(Tcl_Interp* interp) {
-return "compiled Fri Dec 06 23:08:09 +0100 2024 with gccwin32";
+static char* c_cnop(void) {
+return "compiled Fri Dec 27 23:31:53 +0100 2024 with export (0.9.28rc mob 2024-12-15 21:49:16)";
 }
 int tcl_cnop(ClientData clientdata, Tcl_Interp *ip, int objc, Tcl_Obj *CONST objv[]) {
   char* rv;
@@ -68,7 +68,7 @@ int tcl_cnop(ClientData clientdata, Tcl_Interp *ip, int objc, Tcl_Obj *CONST obj
     Tcl_WrongNumArgs(ip, 1, objv, "");
     return TCL_ERROR;
   }
-  rv = c_cnop(ip);
+  rv = c_cnop();
   if (rv == NULL) {
     return(TCL_ERROR);
   }
@@ -127,7 +127,7 @@ TSP_UserDirect_tspnop(Tcl_Interp* interp, int* rc   ) {
     Tcl_Obj* _tmpVar_var_1 = NULL;
     Tcl_Obj* _tmpVar_var_2 = NULL;
     /* constants used for direct tcl and tcl invoked commands */
-    /* const: tspnop ok */
+    /* const: .tspnop ok */
     static Tcl_Obj* _constant_1 = NULL;
     /* const: format */
     static Tcl_Obj* _constant_2 = NULL;
@@ -144,7 +144,7 @@ TSP_UserDirect_tspnop(Tcl_Interp* interp, int* rc   ) {
     /* initialize function pointers for calling other compiled procs, constants */
     if (! directInit) {
         directInit = 1;
-        _constant_1 = TSP_Util_const_string("tspnop ok");/*from create_compilable*/
+        _constant_1 = TSP_Util_const_string(".tspnop ok");/*from create_compilable*/
         _constant_2 = TSP_Util_const_string("format");/*from create_compilable*/
         _constant_3 = TSP_Util_const_string("seconds");/*from create_compilable*/
     }
@@ -152,7 +152,7 @@ TSP_UserDirect_tspnop(Tcl_Interp* interp, int* rc   ) {
     *rc = TCL_OK;     
     /* code must return a value as defined by procdef (unless void), else will raise a compile error */
     /* does only gcc do this with the right option?  what about tcc/clang/msvc++? */
-    /******** tspnop 3: puts "tspnop ok" */
+    /******** tspnop 3: puts ".tspnop ok" */
     /***** ::tsp::gen_direct_tcl puts */
     argObjvArray_0[0] = NULL;
     argObjvArray_0[1] = _constant_1;
@@ -504,6 +504,44 @@ int _tcl_puts(const char* string) {
     return 1; 
 }
 #define puts _tcl_puts
+/* int printf const char* string 
+*/
+int _tcl_printf(char const *format, ...) {
+    /* Helper for Debugging*/
+    char __buf [4096];
+    va_list aptr;
+    int ret;
+    va_start(aptr, format);
+    ret = vsnprintf(__buf, 4096, format, aptr);
+    va_end(aptr);
+    // compensate for surplus linebreaks, sincs puts will already write one
+    if(ret<0) return EOF;
+    if(ret>4096) ret=4096;
+    if(__buf[ret-1]=='\n') __buf[ret-1]=0;
+    Tcl_Interp* ip =  mod_Tcl_interp; //Tcl_CreateInterp();
+    if (ip==NULL) Tcl_Panic("No interp found to call tcl routine!");
+    mod_Tcl_errorCode=0;
+    Tcl_Obj*  argObjvArray [2];
+    Tcl_Obj* funcname = Tcl_NewStringObj("puts",-1);
+    Tcl_IncrRefCount(funcname);
+    argObjvArray[0] = funcname;
+    Tcl_Obj* target_1 = Tcl_NewStringObj(__buf,-1);
+    Tcl_IncrRefCount(target_1);
+    argObjvArray[1] = target_1;
+    int rs = Tcl_EvalObjv(ip, 2, argObjvArray, 0);
+    if(funcname!=NULL) Tcl_DecrRefCount(funcname);
+    if(target_1 != NULL) Tcl_DecrRefCount(target_1);
+    if(rs !=TCL_OK) {
+        mod_Tcl_errorCode=rs;
+        Tcl_Eval (ip, "puts {Error evaluating TCL-Function puts}; puts $errorInfo; flush stdout;");
+        //Tcl_DeleteInterp(ip);
+        return EOF;
+    }
+    Tcl_DoOneEvent(TCL_DONT_WAIT|TCL_ALL_EVENTS);
+    //Tcl_DeleteInterp(ip);
+    return 1; 
+}
+#define printf _tcl_printf
 /* TCL char* _getsysconfig char* cvmtaobl
 */
 /* get some information from the host compiler for configure */
@@ -686,13 +724,154 @@ int tcl__getsysconfig(ClientData clientdata, Tcl_Interp *ip, int objc, Tcl_Obj *
   Tcl_SetObjResult(ip,Tcl_NewStringObj( rv, -1 ));
   return TCL_OK;
 }
-static char* c_ctest1(char* text, int i1) {
+/* TCL int _tclstuff_h_
+*/
+/* just a dummy for including the TCLSTUFF_H into the source */
+/* Written by Cyan Ogilvie, and placed in the public domain
+/*
+_tclstuff_h_
+*/
+// Written by Cyan Ogilvie, and placed in the public domain
+#ifndef _TCLSTUFF_H
+#define _TCLSTUFF_H
+#include <tcl.h>
+#define NEW_CMD( tcl_cmd, c_cmd ) \
+	Tcl_CreateObjCommand( interp, tcl_cmd, \
+			(Tcl_ObjCmdProc *) c_cmd, \
+			(ClientData *) NULL, NULL )
+#define THROW_ERROR( ... )								\
+	do {												\
+		Tcl_AppendResult(interp, ##__VA_ARGS__, NULL);	\
+		return TCL_ERROR;								\
+	} while(0)
+#define APRINTF( fmtstr, ... )											\
+    Tcl_AppendResult(interp, Tcl_ObjPrintf((fmtstr), ##__VA_ARGS__),NULL);        
+#define THROW_PRINTF( fmtstr, ... )											\
+	do {																	\
+		Tcl_SetObjResult(interp, Tcl_ObjPrintf((fmtstr), ##__VA_ARGS__));	\
+		return TCL_ERROR;													\
+	} while(0)
+#define THROW_ERROR_LABEL( label, var, ... )				\
+	do {													\
+		Tcl_AppendResult(interp, ##__VA_ARGS__, NULL);		\
+		var = TCL_ERROR;									\
+		goto label;											\
+	} while(0)
+#define THROW_PRINTF_LABEL( label, var, fmtstr, ... )						\
+	do {																	\
+		Tcl_SetObjResult(interp, Tcl_ObjPrintf((fmtstr), ##__VA_ARGS__));	\
+		var = TCL_ERROR;													\
+		goto label;															\
+	} while(0)
+#define THROW_POSIX_LABEL(label, code, msg)									\
+	do {																	\
+		int err = Tcl_GetErrno();											\
+		const char* errstr = Tcl_ErrnoId();									\
+		Tcl_SetErrorCode(interp, "POSIX", errstr, Tcl_ErrnoMsg(err), NULL);	\
+		THROW_PRINTF_LABEL(label, code, "%s: %s %s", msg, errstr, Tcl_ErrnoMsg(err));	\
+	} while(0)
+// convenience macro to check the number of arguments passed to a function
+// implementing a tcl command against the number expected, and to throw
+// a tcl error if they don't match.  Note that the value of expected does
+// not include the objv[0] object (the function itself)
+#define CHECK_ARGS(expected, msg)										\
+	if (objc != expected + 1) {											\
+		Tcl_WrongNumArgs(interp, 1, objv, sizeof(msg) > 1 ? msg : NULL);\
+		return TCL_ERROR;												\
+	}
+#define CHECK_ARGS_LABEL2(label, rc) \
+	do { \
+		if (objc != A_objc) { \
+			Tcl_WrongNumArgs(interp, A_cmd+1, objv, NULL); \
+			rc = TCL_ERROR; \
+			goto label; \
+		} \
+	} while(0)
+#define CHECK_ARGS_LABEL3(label, rc, msg) \
+	do { \
+		if (objc != A_objc) { \
+			Tcl_WrongNumArgs(interp, A_cmd+1, objv, sizeof(msg) > 1 ? msg : NULL); \
+			rc = TCL_ERROR; \
+			goto label; \
+		} \
+	} while(0)
+#define GET_CHECK_ARGS_LABEL_MACRO(_1,_2,_3,NAME,...) NAME
+#define CHECK_ARGS_LABEL(...) GET_CHECK_ARGS_LABEL_MACRO(__VA_ARGS__, CHECK_ARGS_LABEL3, CHECK_ARGS_LABEL2)(__VA_ARGS__)
+#define CHECK_MIN_ARGS_LABEL(label, rc, msg) \
+	do { \
+		if (objc < A_args) { \
+			Tcl_WrongNumArgs(interp, A_cmd+1, objv, sizeof(msg) > 1 ? msg : NULL); \
+			rc = TCL_ERROR; \
+			goto label; \
+		} \
+	} while(0)
+#define CHECK_RANGE_ARGS_LABEL(label, rc, msg) \
+	do { \
+		if (objc < A_args || objc > A_objc) { \
+			Tcl_WrongNumArgs(interp, A_cmd+1, objv, sizeof(msg) > 1 ? msg : NULL); \
+			rc = TCL_ERROR; \
+			goto label; \
+		} \
+	} while(0)
+// A rather frivolous macro that just enhances readability for a common case
+#define TEST_OK( cmd )		\
+	if (cmd != TCL_OK) return TCL_ERROR
+#define TEST_OK_LABEL( label, var, cmd )		\
+	if (cmd != TCL_OK) { \
+		var = TCL_ERROR; \
+		goto label; \
+	}
+#define TEST_OK_BREAK(var, cmd) if (TCL_OK != (var=(cmd))) break
+static inline void release_tclobj(Tcl_Obj** obj)
+{
+	if (*obj) {
+		Tcl_DecrRefCount(*obj);
+		*obj = NULL;
+	}
+}
+#define RELEASE_MACRO(obj)		if (obj) {Tcl_DecrRefCount(obj); obj=NULL;}
+#define REPLACE_MACRO(target, replacement)	\
+do { \
+	release_tclobj(&target); \
+	if (replacement) Tcl_IncrRefCount(target = replacement); \
+} while(0)
+static inline void replace_tclobj(Tcl_Obj** target, Tcl_Obj* replacement)
+{
+	Tcl_Obj*	old = *target;
+#if DEBUG
+	if (*target && (*target)->refCount <= 0) Tcl_Panic("replace_tclobj target exists but has refcount <= 0: %d", (*target)->refCount);
+#endif
+	*target = replacement;
+	if (*target) Tcl_IncrRefCount(*target);
+	if (old) {
+		Tcl_DecrRefCount(old);
+		old = NULL;
+	}
+}
+#define OBJCMD(name)	int (name)(ClientData cdata, Tcl_Interp* interp, int objc, Tcl_Obj *const objv[])
+#define INIT			int init(Tcl_Interp* interp)
+#define RELEASE			void release(Tcl_Interp* interp)
+#endif
+int _tclstuff_h_(void) {return 1;}
+int _tclstuff_h_(void);
+int tcl__tclstuff_h_(ClientData clientdata, Tcl_Interp *ip, int objc, Tcl_Obj *CONST objv[]) {
+  int rv;
+  if (objc != 1) {
+    Tcl_WrongNumArgs(ip, 1, objv, "");
+    return TCL_ERROR;
+  }
+  rv = _tclstuff_h_();
+  Tcl_SetIntObj(Tcl_GetObjResult(ip), rv);
+  return TCL_OK;
+}
+static char* c_ctest1(Tcl_Interp* interp, char* text, int i1) {
     char buf[256];
     for(int i=0;i<100;i++) mytest1(text,i1);
+    puts ("#---");
     puts (text);
-    sprintf (buf,"size of double %d",sizeof(double));
-    puts (buf);
+    printf ("printf size of double %d\n",sizeof(double));
     puts ("Calling tcl evalobjv");
+    //puts (buf);
     return mytest1(text,i1); 
 }
 int tcl_ctest1(ClientData clientdata, Tcl_Interp *ip, int objc, Tcl_Obj *CONST objv[]) {
@@ -705,7 +884,7 @@ int tcl_ctest1(ClientData clientdata, Tcl_Interp *ip, int objc, Tcl_Obj *CONST o
   }
   _text = Tcl_GetString(objv[1]);
   if (Tcl_GetIntFromObj(ip, objv[2], &_i1) != TCL_OK)    return TCL_ERROR;
-  rv = c_ctest1(_text, _i1);
+  rv = c_ctest1(ip, _text, _i1);
   if (rv == NULL) {
     return(TCL_ERROR);
   }
@@ -714,6 +893,7 @@ int tcl_ctest1(ClientData clientdata, Tcl_Interp *ip, int objc, Tcl_Obj *CONST o
 }
 static char* c_ctest2(char* text, int i1) {
     for(int i=0;i<100;i++) mytest2(text,i1);
+    puts ("#---");
     puts (text);
     puts ("Testing LP-Arch");
 #ifdef __LP64__ 
@@ -750,6 +930,7 @@ int tcl_ctest2(ClientData clientdata, Tcl_Interp *ip, int objc, Tcl_Obj *CONST o
 static char* c_ctest3(char* text, int i1) {
     char buf[256];
     for(int i=0;i<100;i++) tcl_test2 (text,i1);
+    puts ("#---");
     puts (text);
     puts ("Calling tcl proc");
     return tcl_test2 (text,i1); 
@@ -770,6 +951,118 @@ int tcl_ctest3(ClientData clientdata, Tcl_Interp *ip, int objc, Tcl_Obj *CONST o
   }
   Tcl_SetObjResult(ip,Tcl_NewStringObj( rv, -1 ));
   return TCL_OK;
+}
+#undef CLEANUP
+#undef RETURN_VALUE_CLEANUP
+#undef RETURN_VALUE
+#undef ERROR_EXIT
+#define ERROR_EXIT goto error_exit
+#define CLEANUP  \
+\
+    \
+    if (_tmpVar_cmdResultObj != NULL) { Tcl_DecrRefCount(_tmpVar_cmdResultObj); _tmpVar_cmdResultObj = NULL; } \
+    \
+    \
+
+#define RETURN_VALUE_CLEANUP
+#define RETURN_VALUE returnValue
+/* 
+ * compiled proc implementation 
+ *
+ */
+Tcl_WideInt
+TSP_UserDirect_tspinlinec(Tcl_Interp* interp, int* rc   ) {
+    static int directInit = 0;
+    int i;          /* for loop */
+    int len;        /* len, idx1, idx2, str, str2 -for use by lang_string, et.al. */
+    int idx1;
+    int idx2;
+    char* str1;     
+    char* str2;     
+    char* exprErrMsg ;
+    Tcl_Obj* _tmpVar_cmdResultObj = NULL;
+    Tcl_CallFrame* frame; 
+    Tcl_WideInt returnValue;
+    Tcl_Obj** foreachObjv_0 = NULL;
+    /* stack allocated strings */
+    /* variables defined in proc, plus temp vars */
+    Tcl_WideInt _tmpVar_int_1;
+    /* constants used for direct tcl and tcl invoked commands */
+    /* initialize return value */
+    /* initialize string vars */
+    /* var arguments need to be preserved, since they are released in CLEANUP */
+    /* string arguments need to be copied (FIXME: investigate using COW for strings) */
+    /* initialize function pointers for calling other compiled procs, constants */
+    if (! directInit) {
+        directInit = 1;
+    }
+    /* Native proc, no external variables used, dropping PushCallframe/PopCallframe */
+    *rc = TCL_OK;     
+    /* code must return a value as defined by procdef (unless void), else will raise a compile error */
+    /* does only gcc do this with the right option?  what about tcc/clang/msvc++? */
+        /* tsp::inlinec puts(c_ctest3("from tsp::inlinec",123)); */
+    puts(c_ctest3("from tsp::inlinec",123));
+    /******** tspinlinec 4: return 0; */
+    /***** ::tsp::gen_command_return */
+    /***** ::tsp::gen_assign_scalar_text */
+    _tmpVar_int_1 = 0LL;
+    /* ::tsp::lang_return */
+    returnValue = _tmpVar_int_1;
+    *rc = TCL_OK;
+    CLEANUP;
+    /* returnValue is cleaned up by calling proc */;
+    return RETURN_VALUE;
+    /* if void, then we can jump to normal_exit, if not-void, then that means the proc fell through */
+    /* without returning a value.  in that case, set result and return error code*/
+    Tcl_SetResult(interp, "end of proc encountered without 'return' command, proc type: int", TCL_STATIC); goto error_exit;    
+  error_exit:
+    *rc = TCL_ERROR;
+  normal_exit:
+    CLEANUP;
+    RETURN_VALUE_CLEANUP;
+    return RETURN_VALUE;
+}
+/* redefine macros for the Tcl interface function */
+#undef CLEANUP
+#undef RETURN_VALUE_CLEANUP
+#undef RETURN_VALUE
+#undef ERROR_EXIT
+#define CLEANUP \
+
+#define RETURN_VALUE_CLEANUP 
+#define RETURN_VALUE 
+#define ERROR_EXIT goto error_exit
+/* 
+ * Tcl command interface 
+ *
+ */
+int tspinlinec(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+    int _rc;
+    int* rc = &_rc;;
+    Tcl_WideInt returnValue;
+    /* variables used by this command, assigned from objv array */
+    /* allow other compiled procs to find the this proc function at runtime, see TSP_cmd.TSP_User_getCmd() */
+    if (clientData != NULL && objc == 0) {
+        void** cd = clientData;
+        *cd = (void*) TSP_UserDirect_tspinlinec;
+        return TCL_OK;
+    }
+    /* check arg count */
+    if (objc != 1) {
+        Tcl_WrongNumArgs(interp, 1, objv, "");
+        return TCL_ERROR;
+    }
+    /* assign arg variable from objv array */
+    /* invoke compiled proc method */
+    _rc = TCL_OK;
+    returnValue = TSP_UserDirect_tspinlinec(interp, &_rc );
+    if (_rc == TCL_OK) {
+        Tcl_SetObjResult(interp, Tcl_NewWideIntObj((Tcl_WideInt) returnValue));
+        /* ok to fall through */
+    }
+  error_exit:
+    CLEANUP;
+    return _rc;
 }
 static void c___before_tclinit(Tcl_Interp* interp) {
     Tcl_SetVar(interp,  "::TCC_COVERSION1", "...before", 0);    
@@ -815,9 +1108,11 @@ int Tccide_tutorial_Init(Tcl_Interp *interp) {
   Tcl_CreateObjCommand(interp, "::tspnop", tspnop, NULL, NULL);
   Tcl_CreateObjCommand(interp, "::tspcalltcl", tspcalltcl, NULL, NULL);
   Tcl_CreateObjCommand(interp, "_getsysconfig", tcl__getsysconfig, NULL, NULL);
+  Tcl_CreateObjCommand(interp, "_tclstuff_h_", tcl__tclstuff_h_, NULL, NULL);
   Tcl_CreateObjCommand(interp, "ctest1", tcl_ctest1, NULL, NULL);
   Tcl_CreateObjCommand(interp, "ctest2", tcl_ctest2, NULL, NULL);
   Tcl_CreateObjCommand(interp, "ctest3", tcl_ctest3, NULL, NULL);
+  Tcl_CreateObjCommand(interp, "::tspinlinec", tspinlinec, NULL, NULL);
   Tcl_PkgProvide(interp, "tccide_tutorial", "1.0");
   mod_Tcl_interp = interp;
    c___after_tclinit  (interp);
