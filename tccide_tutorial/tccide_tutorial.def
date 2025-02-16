@@ -1,4 +1,0 @@
-LIBRARY tccide_tutorial.dll
-
-EXPORTS
-Tccide_tutorial_Init
